@@ -11,6 +11,7 @@ from starlette.datastructures import MutableHeaders
 from starlette.types import Scope, Receive, Send
 from starlette.requests import Request
 from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 
 from fastmcp import FastMCP
 from fastmcp.server.auth.providers.google import GoogleProvider
@@ -89,11 +90,29 @@ class SecureFastMCP(FastMCP):
         """Override to add secure middleware stack for OAuth 2.1."""
         app = super().http_app(**kwargs)
 
-        # Add middleware in order (first added = outermost layer)
+        # Add middleware — user_middleware index 0 = outermost (first to process requests)
         app.user_middleware.insert(0, well_known_cache_control_middleware)
 
         # Session Management - extracts session info for MCP context
         app.user_middleware.insert(1, session_middleware)
+
+        # CORS must be outermost so preflight OPTIONS requests are handled first
+        cors_origins_raw = os.getenv(
+            "WORKSPACE_MCP_CORS_ORIGINS",
+            "http://localhost,http://localhost:3000,http://127.0.0.1,https://pro.openbb.co,https://pro.openbb.dev",
+        )
+        cors_origins = [o.strip() for o in cors_origins_raw.split(",") if o.strip()]
+        app.user_middleware.insert(
+            0,
+            Middleware(
+                CORSMiddleware,
+                allow_origins=cors_origins,
+                allow_credentials=True,
+                allow_methods=["*"],
+                allow_headers=["*"],
+                expose_headers=["mcp-session-id"],
+            ),
+        )
 
         # Rebuild middleware stack
         app.middleware_stack = app.build_middleware_stack()

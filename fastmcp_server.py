@@ -26,15 +26,28 @@ from auth.scopes import set_enabled_tools
 
 
 def enforce_fastmcp_cloud_defaults():
-    """Force FastMCP Cloud-compatible OAuth settings before initializing the server."""
+    """Force FastMCP Cloud-compatible OAuth settings before initializing the server.
+
+    Skipped when:
+    - Service account mode is configured (incompatible with OAuth 2.1)
+    - MCP_ENABLE_OAUTH21 is explicitly set to false (local/single-user deployment)
+    """
+    if os.environ.get("GOOGLE_SERVICE_ACCOUNT_KEY_FILE") or os.environ.get(
+        "GOOGLE_SERVICE_ACCOUNT_KEY_JSON"
+    ):
+        return []
+
+    if (os.environ.get("MCP_ENABLE_OAUTH21") or "").lower() == "false":
+        return []
+
     enforced = []
 
     required = {
         "MCP_ENABLE_OAUTH21": "true",
-        "WORKSPACE_MCP_STATELESS_MODE": "true",
+        "WORKSPACE_MCP_STATELESS_MODE": "false",
     }
     defaults = {
-        "MCP_SINGLE_USER_MODE": "false",
+        "MCP_SINGLE_USER_MODE": "true",
     }
 
     for key, target in required.items():
