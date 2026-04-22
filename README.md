@@ -1,6 +1,6 @@
-This is a fork for connecting as an OpenBB Workspace MCP server. The intention is for the developer to run the server locally add it as a MCP server in Workspace.
+This is a fork for connecting as an OpenBB Workspace MCP server. The intention is for the developer to run the server locally, and to add as a MCP server in Workspace.
 
-Do not run this as a production application.
+**Do not run this as a production application.**
 
 ### Installation
 
