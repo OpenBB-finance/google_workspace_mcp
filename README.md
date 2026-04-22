@@ -1,3 +1,44 @@
+This is a fork for connecting as an OpenBB Workspace MCP server. The intention is for the developer to run the server locally add it as a MCP server in Workspace.
+
+Do not run this as a production application.
+
+### Installation
+
+Install in a Python environment >=3.11
+
+```sh
+pip install -e .
+```
+
+### Configure Environment
+
+Set these environment variables before starting the server:
+
+```env
+MCP_ENABLE_OAUTH21=false
+MCP_SINGLE_USER_MODE=false
+EXTERNAL_OAUTH21_PROVIDER=false
+GOOGLE_OAUTH_CLIENT_ID=
+GOOGLE_OAUTH_CLIENT_SECRET=
+OAUTHLIB_INSECURE_TRANSPORT=1
+OAUTH2_ENABLE_DEBUG=false
+MCP_ENABLE_OAUTH21=false
+WORKSPACE_MCP_STATELESS_MODE=false
+WORKSPACE_MCP_BASE_URI=http://localhost
+GOOGLE_OAUTH_REDIRECT_URI=http://localhost:8000/oauth2callback
+USER_GOOGLE_EMAIL=
+```
+
+### Launch
+
+Start the server with:
+
+```sh
+python main.py --tools gmail calendar --transport streamable-http
+```
+
+The connection address is available at: http://0.0.0.0:8000/mcp
+
 <!-- mcp-name: io.github.taylorwilsdon/workspace-mcp -->
 
 <div align="center">
